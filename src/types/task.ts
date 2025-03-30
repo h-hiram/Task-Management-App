@@ -23,5 +23,12 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   pending: 'Pending',
   completed: 'Completed',
   deferred: 'Deferred',
-  deployed: 'Deployed',
+  deployed: 'Ongoing',  // Changed label to better reflect meaning
+};
+
+export const CATEGORY_DESCRIPTIONS: Record<Category, string> = {
+  pending: 'Tasks that need to be done',
+  completed: 'Tasks that have been finished',
+  deferred: 'Tasks that have been postponed',
+  deployed: 'Long-running tasks that might take days to complete',
 };

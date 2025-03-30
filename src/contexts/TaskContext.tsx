@@ -4,6 +4,9 @@ import { Task, Priority, Category } from '@/types/task';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 
+// Create audio element for notification sound
+const notificationSound = new Audio('/notification.mp3');
+
 interface TaskContextType {
   tasks: Task[];
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -61,11 +64,11 @@ const loadTasks = (): Task[] => {
     },
     {
       id: '3',
-      title: 'Update documentation',
-      description: 'Update the project documentation with recent changes',
+      title: 'System maintenance',
+      description: 'Ongoing system maintenance that will run for several days',
       dueDate: new Date(new Date().setDate(new Date().getDate() + 3)),
-      priority: 'low' as Priority,
-      category: 'deferred' as Category,
+      priority: 'medium' as Priority,
+      category: 'deployed' as Category,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -101,6 +104,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // If the task is due within the next minute and is not completed
         if (timeDiff <= 60000 && timeDiff > 0 && task.category !== 'completed') {
+          // Play notification sound
+          notificationSound.play().catch(err => console.error("Could not play notification sound:", err));
+          
           toast(`Task Due: ${task.title}`, {
             description: `Priority: ${task.priority.toUpperCase()}`,
             duration: 5000,
@@ -109,6 +115,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     };
 
+    // Check immediately when component mounts
+    checkDueTasks();
     const intervalId = setInterval(checkDueTasks, 60000);
     return () => clearInterval(intervalId);
   }, [tasks]);
@@ -205,3 +213,4 @@ export const useTaskContext = () => {
   }
   return context;
 };
+

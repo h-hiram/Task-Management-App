@@ -1,13 +1,19 @@
 
 import React from 'react';
 import { format } from 'date-fns';
-import { Task, PRIORITY_LABELS, CATEGORY_LABELS } from '@/types/task';
+import { Task, PRIORITY_LABELS, CATEGORY_LABELS, CATEGORY_DESCRIPTIONS } from '@/types/task';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarIcon, Clock, ArrowUpCircle, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTaskContext } from '@/contexts/TaskContext';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TaskCardProps {
   task: Task;
@@ -62,16 +68,25 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit }) => {
           >
             {PRIORITY_LABELS[task.priority]}
           </Badge>
-          <Badge 
-            className={cn(
-              task.category === 'pending' && "bg-category-pending",
-              task.category === 'completed' && "bg-category-completed",
-              task.category === 'deferred' && "bg-category-deferred",
-              task.category === 'deployed' && "bg-category-deployed"
-            )}
-          >
-            {CATEGORY_LABELS[task.category]}
-          </Badge>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge 
+                  className={cn(
+                    task.category === 'pending' && "bg-category-pending",
+                    task.category === 'completed' && "bg-category-completed",
+                    task.category === 'deferred' && "bg-category-deferred",
+                    task.category === 'deployed' && "bg-category-deployed"
+                  )}
+                >
+                  {CATEGORY_LABELS[task.category]}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{CATEGORY_DESCRIPTIONS[task.category]}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-2">
