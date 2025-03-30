@@ -30,11 +30,11 @@ const TaskFilter: React.FC = () => {
   };
 
   const handlePriorityChange = (value: string) => {
-    setFilterPriority(value ? value as Priority : null);
+    setFilterPriority(value === "all" ? null : value as Priority);
   };
 
   const handleCategoryChange = (value: string) => {
-    setFilterCategory(value ? value as Category : null);
+    setFilterCategory(value === "all" ? null : value as Category);
   };
 
   return (
@@ -51,12 +51,12 @@ const TaskFilter: React.FC = () => {
         </div>
         
         <div className="flex gap-3">
-          <Select value={filterPriority || ''} onValueChange={handlePriorityChange}>
+          <Select value={filterPriority || 'all'} onValueChange={handlePriorityChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Priorities</SelectItem>
+              <SelectItem value="all">All Priorities</SelectItem>
               {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
                 <SelectItem 
                   key={value} 
@@ -68,12 +68,12 @@ const TaskFilter: React.FC = () => {
             </SelectContent>
           </Select>
           
-          <Select value={filterCategory || ''} onValueChange={handleCategoryChange}>
+          <Select value={filterCategory || 'all'} onValueChange={handleCategoryChange}>
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
                 <SelectItem 
                   key={value} 

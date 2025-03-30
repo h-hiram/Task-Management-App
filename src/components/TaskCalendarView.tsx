@@ -1,16 +1,12 @@
 
-import React, { useMemo } from 'react';
-import { Calendar } from '@/components/ui/calendar';
-import { format, isSameDay } from 'date-fns';
+import React from 'react';
 import { useTaskContext } from '@/contexts/TaskContext';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, addDays, isToday, isSameMonth } from 'date-fns';
 import { Task } from '@/types/task';
-import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { CalendarHeader, CalendarHeading, Calendar, DayProps } from '@/components/ui/calendar';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TaskCalendarViewProps {
   onDateSelect: (date: Date) => void;
@@ -19,142 +15,117 @@ interface TaskCalendarViewProps {
 
 const TaskCalendarView: React.FC<TaskCalendarViewProps> = ({ onDateSelect, onTaskSelect }) => {
   const { tasks } = useTaskContext();
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
-
-  // Group tasks by date for easy access
-  const tasksByDate = useMemo(() => {
-    const result: Record<string, Task[]> = {};
-    
-    tasks.forEach(task => {
-      const dateKey = format(new Date(task.dueDate), 'yyyy-MM-dd');
-      if (!result[dateKey]) {
-        result[dateKey] = [];
-      }
-      result[dateKey].push(task);
+  const [currentMonth, setCurrentMonth] = React.useState(new Date());
+  
+  const prevMonth = () => {
+    setCurrentMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() - 1);
+      return newDate;
     });
-    
-    return result;
-  }, [tasks]);
-
-  // List of tasks for selected date
-  const tasksForSelectedDate = useMemo(() => {
-    if (!selectedDate) return [];
-    const dateKey = format(selectedDate, 'yyyy-MM-dd');
-    return tasksByDate[dateKey] || [];
-  }, [selectedDate, tasksByDate]);
-
-  // Handle date selection
-  const handleSelect = (date: Date | undefined) => {
-    setSelectedDate(date);
-    if (date) {
-      onDateSelect(date);
-    }
   };
-
+  
+  const nextMonth = () => {
+    setCurrentMonth(prev => {
+      const newDate = new Date(prev);
+      newDate.setMonth(prev.getMonth() + 1);
+      return newDate;
+    });
+  };
+  
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  
+  // Add days from previous and next month to fill the calendar
+  const startDay = monthStart.getDay();
+  const endDay = 6 - monthEnd.getDay();
+  
+  const previousMonthDays = startDay > 0 
+    ? eachDayOfInterval({ 
+        start: addDays(monthStart, -startDay), 
+        end: addDays(monthStart, -1) 
+      }) 
+    : [];
+  
+  const nextMonthDays = endDay > 0 
+    ? eachDayOfInterval({ 
+        start: addDays(monthEnd, 1), 
+        end: addDays(monthEnd, endDay) 
+      }) 
+    : [];
+  
+  const allDays = [...previousMonthDays, ...daysInMonth, ...nextMonthDays];
+  
+  const getTasksForDate = (date: Date) => {
+    return tasks.filter(task => isSameDay(new Date(task.dueDate), date));
+  };
+  
+  const renderDay = (props: any) => {
+    const { date } = props;
+    const tasksForDay = getTasksForDate(date);
+    const isCurrentMonth = isSameMonth(date, currentMonth);
+    
+    return (
+      <div
+        className={cn(
+          "h-28 p-1 border border-gray-200 overflow-hidden",
+          !isCurrentMonth && "bg-gray-50 text-gray-400",
+          isToday(date) && "bg-blue-50 font-bold",
+          "relative"
+        )}
+        onClick={() => onDateSelect(date)}
+      >
+        <div className="text-xs mb-1">{format(date, 'd')}</div>
+        <div className="space-y-1 overflow-y-auto max-h-[80%]">
+          {tasksForDay.map(task => (
+            <div
+              key={task.id}
+              className={cn(
+                "text-xs p-1 rounded truncate cursor-pointer",
+                `bg-priority-${task.priority}`,
+                `text-white`
+              )}
+              onClick={(e) => {
+                e.stopPropagation();
+                onTaskSelect(task);
+              }}
+              title={task.title}
+            >
+              {task.title}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+  
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      <div className="flex-1 flex justify-center">
-        <TooltipProvider>
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleSelect}
-            className="border rounded-md p-3"
-            components={{
-              Day: ({ day, ...props }) => {
-                // Check if there are tasks on this day
-                const dateKey = format(day, 'yyyy-MM-dd');
-                const dayTasks = tasksByDate[dateKey] || [];
-                const hasTasks = dayTasks.length > 0;
-
-                // Count tasks by priority
-                const highPriorityCount = dayTasks.filter(t => t.priority === 'high').length;
-                const mediumPriorityCount = dayTasks.filter(t => t.priority === 'medium').length;
-                const lowPriorityCount = dayTasks.filter(t => t.priority === 'low').length;
-
-                return (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        {...props}
-                        className={`${props.className} relative ${
-                          hasTasks 
-                            ? 'font-bold' 
-                            : ''
-                        } ${selectedDate && isSameDay(day, selectedDate) ? 'bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground' : ''}`}
-                      >
-                        <time dateTime={format(day, 'yyyy-MM-dd')}>{format(day, 'd')}</time>
-                        
-                        {hasTasks && (
-                          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-0.5">
-                            {highPriorityCount > 0 && (
-                              <div className="h-1.5 w-1.5 rounded-full bg-priority-high" />
-                            )}
-                            {mediumPriorityCount > 0 && (
-                              <div className="h-1.5 w-1.5 rounded-full bg-priority-medium" />
-                            )}
-                            {lowPriorityCount > 0 && (
-                              <div className="h-1.5 w-1.5 rounded-full bg-priority-low" />
-                            )}
-                          </div>
-                        )}
-                      </button>
-                    </TooltipTrigger>
-                    {hasTasks && (
-                      <TooltipContent>
-                        <div className="text-sm p-1">
-                          <p className="font-bold mb-1">{format(day, 'MMMM d, yyyy')}</p>
-                          <p>{dayTasks.length} task{dayTasks.length !== 1 ? 's' : ''}</p>
-                        </div>
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                );
-              },
-            }}
-          />
-        </TooltipProvider>
+    <div className="bg-white rounded-lg shadow">
+      <div className="flex justify-between items-center p-4 border-b">
+        <h2 className="text-xl font-bold">{format(currentMonth, 'MMMM yyyy')}</h2>
+        <div className="flex space-x-2">
+          <Button variant="outline" size="icon" onClick={prevMonth}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={nextMonth}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       
-      <div className="flex-1">
-        <div className="border rounded-md p-4">
-          <h3 className="text-lg font-medium mb-4">
-            {selectedDate ? format(selectedDate, 'MMMM d, yyyy') : 'Select a date'}
-          </h3>
-          
-          {tasksForSelectedDate.length > 0 ? (
-            <div className="space-y-3">
-              {tasksForSelectedDate.map(task => (
-                <div 
-                  key={task.id}
-                  className="border rounded-md p-3 hover:bg-muted cursor-pointer transition-colors"
-                  onClick={() => onTaskSelect(task)}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium">{task.title}</h4>
-                    <Badge 
-                      className={`${
-                        task.priority === 'high' 
-                          ? 'bg-priority-high' 
-                          : task.priority === 'medium'
-                          ? 'bg-priority-medium'
-                          : 'bg-priority-low'
-                      }`}
-                    >
-                      {task.priority}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-2">{task.description}</p>
-                  <div className="text-xs text-gray-400">
-                    {format(new Date(task.dueDate), 'h:mm a')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-center py-8">No tasks for this date</p>
-          )}
-        </div>
+      <div className="grid grid-cols-7 text-center text-sm font-medium border-b">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div key={day} className="py-2">{day}</div>
+        ))}
+      </div>
+      
+      <div className="grid grid-cols-7">
+        {allDays.map((day, i) => (
+          <div key={i} className="min-h-[100px]">
+            {renderDay({ date: day })}
+          </div>
+        ))}
       </div>
     </div>
   );
