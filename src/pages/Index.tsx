@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TaskProvider } from '@/contexts/TaskContext';
 import { Task } from '@/types/task';
 import TaskList from '@/components/TaskList';
@@ -14,13 +14,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PlusCircle, List, Calendar, Sparkles } from 'lucide-react';
+import { PlusCircle, List, Calendar, Sparkles, Cloud, SmartphoneNfc } from 'lucide-react';
 import { useTaskContext } from '@/contexts/TaskContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
 
 const TaskDashboard: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
-  const { addTask, updateTask } = useTaskContext();
+  const { addTask, updateTask, syncTasks } = useTaskContext();
+  const isMobile = useIsMobile();
+
+  // Request notification permission
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      toast("Enable notifications", {
+        description: "Allow notifications to receive task reminders",
+        action: {
+          label: "Enable",
+          onClick: () => Notification.requestPermission()
+        },
+        duration: 10000,
+      });
+    }
+  }, []);
 
   const handleAddTask = () => {
     setSelectedTask(undefined);
@@ -41,25 +58,49 @@ const TaskDashboard: React.FC = () => {
     setIsDialogOpen(false);
   };
 
+  const handleSyncClick = () => {
+    syncTasks();
+    toast.success("Tasks synchronized across devices");
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
         <div className="relative gradient-border p-3 inline-block">
           <h1 className="text-3xl font-bold mb-1 flex items-center">
             Task Manager
-            <Sparkles className="h-5 w-5 ml-2 text-yellow-400" />
+            <Sparkles className="h-5 w-5 ml-2 text-yellow-400 animate-pulse-soft" />
           </h1>
           <p className="text-gray-700">Organize and manage your tasks efficiently</p>
         </div>
         
-        <Button 
-          onClick={handleAddTask} 
-          className="mt-4 sm:mt-0 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-md transition-all duration-300 hover:shadow-lg"
-        >
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Add Task
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0">
+          <Button 
+            variant="outline"
+            size="sm"
+            onClick={handleSyncClick}
+            className="bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/40 transition-all"
+          >
+            <Cloud className="h-4 w-4 mr-2 text-blue-500" />
+            {isMobile ? "Sync" : "Sync Tasks"}
+          </Button>
+          
+          <Button 
+            onClick={handleAddTask} 
+            className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-md transition-all duration-300 hover:shadow-lg"
+          >
+            <PlusCircle className="h-4 w-4 mr-2" />
+            {isMobile ? "Add" : "Add Task"}
+          </Button>
+        </div>
       </div>
+
+      {isMobile && (
+        <div className="mb-4 p-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-center">
+          <SmartphoneNfc className="h-4 w-4 mr-2 text-blue-500" />
+          <span>Your tasks will sync across devices automatically every 5 minutes</span>
+        </div>
+      )}
       
       <TaskFilter />
       

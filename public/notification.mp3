@@ -1,6 +1,4 @@
 
-```binary
-// The binary content would go here, but since we can't directly include binary data,
-// we'll use a base64 encoded version of a simple notification sound.
-// In a real scenario, you would need to upload the actual notification.mp3 file.
-```
+// Since we can't directly include binary data, you would need to upload a proper
+// notification.mp3 file. This is a placeholder to indicate that the file should be updated
+// with a clear, pleasant notification sound that works well on both desktop and mobile devices.

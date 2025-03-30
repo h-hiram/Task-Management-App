@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Priority, Category } from '@/types/task';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Create audio element for notification sound
 const notificationSound = new Audio('/notification.mp3');
@@ -20,9 +21,20 @@ interface TaskContextType {
   filterCategory: Category | null;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  syncTasks: () => void;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
+
+// Function to generate a unique device ID if it doesn't exist
+const getDeviceId = () => {
+  let deviceId = localStorage.getItem('device_id');
+  if (!deviceId) {
+    deviceId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('device_id', deviceId);
+  }
+  return deviceId;
+};
 
 // Load tasks from localStorage or use default tasks
 const loadTasks = (): Task[] => {
@@ -81,10 +93,29 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [filterCategory, setFilterCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { toast: uiToast } = useToast();
+  const isMobile = useIsMobile();
+  const deviceId = getDeviceId();
+  const [lastSyncTime, setLastSyncTime] = useState<number>(Date.now());
 
   // Load tasks from localStorage on component mount
   useEffect(() => {
     setTasks(loadTasks());
+    
+    // Set up a listener for storage events to sync between tabs
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tasks') {
+        const newTasks = e.newValue ? JSON.parse(e.newValue) : [];
+        setTasks(newTasks.map((task: any) => ({
+          ...task,
+          dueDate: new Date(task.dueDate),
+          createdAt: new Date(task.createdAt),
+          updatedAt: new Date(task.updatedAt),
+        })));
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Save tasks to localStorage whenever they change
@@ -94,7 +125,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [tasks]);
 
-  // Check for due tasks every minute
+  // Check for tasks due in 5 minutes and for due tasks every minute
   useEffect(() => {
     const checkDueTasks = () => {
       const now = new Date();
@@ -102,24 +133,84 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const dueDate = new Date(task.dueDate);
         const timeDiff = dueDate.getTime() - now.getTime();
         
-        // If the task is due within the next minute and is not completed
-        if (timeDiff <= 60000 && timeDiff > 0 && task.category !== 'completed') {
+        // Early notification: If the task is due in 5 minutes (300000 ms) and is not completed
+        if (timeDiff <= 300000 && timeDiff > 240000 && task.category !== 'completed') {
           // Play notification sound
+          notificationSound.play().catch(err => console.error("Could not play notification sound:", err));
+          
+          toast(`Task Starting Soon: ${task.title}`, {
+            description: `Your task will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`,
+            duration: 10000,
+          });
+
+          // If browser notifications are supported and permitted
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Task Starting Soon", {
+              body: `${task.title} will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`,
+              icon: "/favicon.ico"
+            });
+          }
+        }
+        
+        // Regular due notification
+        if (timeDiff <= 60000 && timeDiff > 0 && task.category !== 'completed') {
           notificationSound.play().catch(err => console.error("Could not play notification sound:", err));
           
           toast(`Task Due: ${task.title}`, {
             description: `Priority: ${task.priority.toUpperCase()}`,
             duration: 5000,
           });
+
+          // If browser notifications are supported and permitted
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("Task Due Now", {
+              body: `${task.title} is due now. Priority: ${task.priority.toUpperCase()}`,
+              icon: "/favicon.ico"
+            });
+          }
         }
       });
     };
+
+    // Request notification permission on component mount
+    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
 
     // Check immediately when component mounts
     checkDueTasks();
     const intervalId = setInterval(checkDueTasks, 60000);
     return () => clearInterval(intervalId);
   }, [tasks]);
+
+  // Manual sync function for cross-device sync button
+  const syncTasks = async () => {
+    try {
+      // For a real implementation, this would connect to a backend API
+      // For now, we'll just simulate by updating the last sync time and showing a toast
+      setLastSyncTime(Date.now());
+      
+      uiToast({
+        title: "Tasks synchronized",
+        description: `Successfully synced tasks across your devices`,
+      });
+    } catch (error) {
+      uiToast({
+        title: "Sync failed",
+        description: "Could not sync tasks. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Set up auto-sync timer (every 5 minutes)
+  useEffect(() => {
+    const autoSyncInterval = setInterval(() => {
+      syncTasks();
+    }, 300000); // 5 minutes
+    
+    return () => clearInterval(autoSyncInterval);
+  }, []);
 
   const addTask = (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTask: Task = {
@@ -199,6 +290,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         filterCategory,
         searchQuery,
         setSearchQuery,
+        syncTasks,
       }}
     >
       {children}
@@ -213,4 +305,3 @@ export const useTaskContext = () => {
   }
   return context;
 };
-

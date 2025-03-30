@@ -98,7 +98,7 @@
 
   body {
     @apply bg-background text-foreground relative;
-    background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+    background: linear-gradient(135deg, #c2e9fb 0%, #a1c4fd 100%);
     min-height: 100vh;
   }
 
@@ -110,8 +110,8 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 25%),
-      radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.15) 0%, transparent 30%);
+      radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 30%),
+      radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.2) 0%, transparent 35%);
     z-index: -1;
     animation: pulse 15s ease-in-out infinite alternate;
   }
@@ -128,54 +128,75 @@
     z-index: -1;
   }
 
+  /* Enhanced floating bubbles */
   .floating-bubble {
     position: absolute;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
     border-radius: 50%;
-    opacity: 0.4;
+    opacity: 0.6;
     pointer-events: none;
     z-index: -1;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.8);
   }
 
   .bubble-1 {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     top: 10%;
     left: 10%;
     animation: float 20s ease-in-out infinite;
   }
 
   .bubble-2 {
-    width: 150px;
-    height: 150px;
+    width: 170px;
+    height: 170px;
     top: 40%;
     right: 15%;
     animation: float 25s ease-in-out infinite reverse;
   }
 
   .bubble-3 {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     bottom: 20%;
     left: 30%;
     animation: float 18s ease-in-out infinite 2s;
   }
 
+  /* New colorful bubbles */
+  .bubble-4 {
+    width: 80px;
+    height: 80px;
+    top: 60%;
+    right: 25%;
+    background: radial-gradient(circle at center, rgba(255, 166, 158, 0.8) 0%, rgba(255, 166, 158, 0) 70%);
+    animation: float 22s ease-in-out infinite 1s;
+  }
+
+  .bubble-5 {
+    width: 140px;
+    height: 140px;
+    top: 25%;
+    left: 45%;
+    background: radial-gradient(circle at center, rgba(160, 199, 254, 0.8) 0%, rgba(160, 199, 254, 0) 70%);
+    animation: float 28s ease-in-out infinite 3s;
+  }
+
   @keyframes float {
     0% {
-      transform: translateY(0) translateX(0);
+      transform: translateY(0) translateX(0) scale(1);
     }
     25% {
-      transform: translateY(-15px) translateX(15px);
+      transform: translateY(-20px) translateX(15px) scale(1.05);
     }
     50% {
-      transform: translateY(10px) translateX(-10px);
+      transform: translateY(10px) translateX(-20px) scale(0.95);
     }
     75% {
-      transform: translateY(-5px) translateX(5px);
+      transform: translateY(-10px) translateX(10px) scale(1.02);
     }
     100% {
-      transform: translateY(0) translateX(0);
+      transform: translateY(0) translateX(0) scale(1);
     }
   }
 
@@ -191,18 +212,39 @@
     }
   }
   
-  /* Card styling enhancements */
+  /* Enhanced card styling */
   .card, .bg-card {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    transition: all 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(31, 38, 135, 0.25);
+  }
+
+  /* Mobile optimization */
+  @media (max-width: 640px) {
+    body {
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 1.75rem !important;
+    }
+
+    .card {
+      margin-bottom: 1rem;
+    }
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/20 backdrop-blur-md rounded-lg border border-white/30 shadow-xl;
+    @apply bg-white/30 backdrop-blur-md rounded-lg border border-white/40 shadow-xl;
   }
 
   .gradient-border {
@@ -223,6 +265,52 @@
     animation: border-animation 6s linear infinite;
   }
 
+  /* Enhanced button styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-md transition-all duration-300 hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/40 transition-all;
+  }
+
+  /* Vibrant badges */
+  .badge-vibrant {
+    @apply font-medium text-xs px-2.5 py-0.5 rounded-full shadow-sm;
+  }
+
+  .badge-vibrant.high {
+    @apply bg-gradient-to-r from-red-500 to-pink-500 text-white;
+  }
+
+  .badge-vibrant.medium {
+    @apply bg-gradient-to-r from-orange-400 to-amber-500 text-white;
+  }
+
+  .badge-vibrant.low {
+    @apply bg-gradient-to-r from-blue-400 to-cyan-500 text-white;
+  }
+
+  /* Animated elements */
+  .pulse-soft {
+    animation: pulse-animation 3s infinite;
+  }
+
+  @keyframes pulse-animation {
+    0% {
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.95);
+      opacity: 0.7;
+    }
+  }
+
   @keyframes border-animation {
     0% {
       filter: hue-rotate(0deg);
@@ -230,5 +318,23 @@
     100% {
       filter: hue-rotate(360deg);
     }
+  }
+
+  /* Card transitions */
+  .card-transition {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Calendar styling */
+  .calendar-day {
+    @apply rounded-md hover:bg-purple-100 transition-colors;
+  }
+
+  .calendar-day.has-tasks {
+    @apply bg-purple-50 font-medium border-purple-200;
+  }
+
+  .calendar-day.selected {
+    @apply bg-purple-200 font-bold;
   }
 }

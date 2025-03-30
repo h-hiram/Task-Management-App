@@ -1,0 +1,17 @@
+
+{
+  "name": "Task Manager",
+  "short_name": "Tasks",
+  "description": "A vibrant task management application",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e0c3fc",
+  "theme_color": "#8ec5fc",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
