@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PlusCircle, List, Calendar } from 'lucide-react';
+import { PlusCircle, List, Calendar, Sparkles } from 'lucide-react';
 import { useTaskContext } from '@/contexts/TaskContext';
 
 const TaskDashboard: React.FC = () => {
@@ -42,16 +42,19 @@ const TaskDashboard: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8 relative z-10">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold mb-1">Task Manager</h1>
-          <p className="text-gray-500">Organize and manage your tasks efficiently</p>
+        <div className="relative gradient-border p-3 inline-block">
+          <h1 className="text-3xl font-bold mb-1 flex items-center">
+            Task Manager
+            <Sparkles className="h-5 w-5 ml-2 text-yellow-400" />
+          </h1>
+          <p className="text-gray-700">Organize and manage your tasks efficiently</p>
         </div>
         
         <Button 
           onClick={handleAddTask} 
-          className="mt-4 sm:mt-0"
+          className="mt-4 sm:mt-0 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white shadow-md transition-all duration-300 hover:shadow-lg"
         >
           <PlusCircle className="h-4 w-4 mr-2" />
           Add Task
@@ -61,12 +64,12 @@ const TaskDashboard: React.FC = () => {
       <TaskFilter />
       
       <Tabs defaultValue="list" className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="list">
+        <TabsList className="mb-6 glass-card">
+          <TabsTrigger value="list" className="data-[state=active]:bg-white/80">
             <List className="h-4 w-4 mr-2" />
             List View
           </TabsTrigger>
-          <TabsTrigger value="calendar">
+          <TabsTrigger value="calendar" className="data-[state=active]:bg-white/80">
             <Calendar className="h-4 w-4 mr-2" />
             Calendar View
           </TabsTrigger>
@@ -85,7 +88,7 @@ const TaskDashboard: React.FC = () => {
       </Tabs>
       
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md glass-card border-white/40 backdrop-blur-lg">
           <DialogHeader>
             <DialogTitle>
               {selectedTask ? 'Edit Task' : 'Create New Task'}

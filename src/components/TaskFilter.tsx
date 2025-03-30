@@ -38,7 +38,7 @@ const TaskFilter: React.FC = () => {
   };
 
   return (
-    <div className="bg-card p-4 rounded-md shadow-sm mb-6">
+    <div className="glass-card p-4 rounded-md shadow-sm mb-6">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -46,13 +46,13 @@ const TaskFilter: React.FC = () => {
             placeholder="Search tasks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-white/70 backdrop-blur-sm border-white/40"
           />
         </div>
         
         <div className="flex gap-3">
           <Select value={filterPriority || 'all'} onValueChange={handlePriorityChange}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] bg-white/70 backdrop-blur-sm">
               <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
@@ -69,7 +69,7 @@ const TaskFilter: React.FC = () => {
           </Select>
           
           <Select value={filterCategory || 'all'} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px] bg-white/70 backdrop-blur-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -91,6 +91,7 @@ const TaskFilter: React.FC = () => {
             onClick={handleClearFilters}
             disabled={!filterPriority && !filterCategory && !searchQuery}
             title="Clear all filters"
+            className="bg-white/70 backdrop-blur-sm hover:bg-white/90"
           >
             <FilterX className="h-4 w-4" />
           </Button>
