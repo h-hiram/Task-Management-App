@@ -15,10 +15,11 @@ export function useCapacitor(): CapacitorState {
       try {
         // Check if we're running in a Capacitor app
         const isCapacitorApp = 
+          typeof window !== 'undefined' && 
           window.Capacitor !== undefined && 
           window.Capacitor.isNativePlatform();
           
-        setState({ isCapacitorApp });
+        setState({ isCapacitorApp: !!isCapacitorApp });
       } catch (error) {
         console.error('Error checking Capacitor status:', error);
         setState({ isCapacitorApp: false });
