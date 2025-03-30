@@ -8,14 +8,20 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BackgroundEffects from "./components/BackgroundEffects";
 import { useEffect } from "react";
+import NotificationService from "./services/NotificationService";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Preload notification sound
+  // Initialize Notification Service
   useEffect(() => {
+    const notificationService = NotificationService.getInstance();
+    
+    // Request notification permissions
+    notificationService.requestPermission();
+    
+    // Preload notification sound
     const audio = new Audio('/notification.mp3');
-    // Preload audio
     audio.load();
   }, []);
 

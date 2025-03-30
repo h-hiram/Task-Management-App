@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -36,29 +37,40 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Mobile Installation Instructions
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To run the app on a mobile device:
 
-**Use GitHub Codespaces**
+1. Transfer the project to your GitHub repository using the "Export to GitHub" button
+2. Git pull the project from your own GitHub repository
+3. Run `npm install` to install all dependencies
+4. Add iOS and/or Android platforms:
+   - For Android: `npx cap add android`
+   - For iOS: `npx cap add ios` (requires macOS with Xcode)
+5. Build the project: `npm run build`
+6. Sync the web code to the native project: `npx cap sync`
+7. Open and run the project:
+   - For Android: `npx cap open android` (requires Android Studio)
+   - For iOS: `npx cap open ios` (requires Xcode)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Updating the app after changes
+
+After making changes to your web code:
+
+1. Build the project: `npm run build`
+2. Sync changes to the native project: `npx cap sync`
+3. Open and run the project again
 
 ## What technologies are used for this project?
 
-This project is built with .
+This project is built with:
 
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Capacitor (for mobile apps)
 
 ## How can I deploy this project?
 

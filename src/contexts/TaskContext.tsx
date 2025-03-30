@@ -1,12 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Priority, Category } from '@/types/task';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
-
-// Create audio element for notification sound
-const notificationSound = new Audio('/notification.mp3');
+import NotificationService from '@/services/NotificationService';
 
 interface TaskContextType {
   tasks: Task[];
@@ -34,6 +31,14 @@ const getDeviceId = () => {
     localStorage.setItem('device_id', deviceId);
   }
   return deviceId;
+};
+
+// Create a BroadcastChannel for cross-tab communication if supported
+const createBroadcastChannel = () => {
+  if (typeof BroadcastChannel !== 'undefined') {
+    return new BroadcastChannel('task_sync_channel');
+  }
+  return null;
 };
 
 // Load tasks from localStorage or use default tasks
@@ -96,6 +101,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isMobile = useIsMobile();
   const deviceId = getDeviceId();
   const [lastSyncTime, setLastSyncTime] = useState<number>(Date.now());
+  const [broadcastChannel] = useState(createBroadcastChannel());
+  const notificationService = NotificationService.getInstance();
 
   // Load tasks from localStorage on component mount
   useEffect(() => {
@@ -114,16 +121,46 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
+    // Listen for BroadcastChannel messages
+    const handleBroadcastMessage = (event: MessageEvent) => {
+      if (event.data.type === 'TASKS_UPDATED') {
+        setTasks(event.data.tasks.map((task: any) => ({
+          ...task,
+          dueDate: new Date(task.dueDate),
+          createdAt: new Date(task.createdAt),
+          updatedAt: new Date(task.updatedAt),
+        })));
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+    if (broadcastChannel) {
+      broadcastChannel.addEventListener('message', handleBroadcastMessage);
+    }
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      if (broadcastChannel) {
+        broadcastChannel.removeEventListener('message', handleBroadcastMessage);
+      }
+    };
+  }, [broadcastChannel]);
 
   // Save tasks to localStorage whenever they change
   useEffect(() => {
     if (typeof window !== 'undefined' && tasks.length > 0) {
       localStorage.setItem('tasks', JSON.stringify(tasks));
+      
+      // Broadcast to other tabs/windows
+      if (broadcastChannel) {
+        broadcastChannel.postMessage({
+          type: 'TASKS_UPDATED',
+          tasks: tasks,
+          sourceDeviceId: deviceId
+        });
+      }
     }
-  }, [tasks]);
+  }, [tasks, broadcastChannel, deviceId]);
 
   // Check for tasks due in 5 minutes and for due tasks every minute
   useEffect(() => {
@@ -135,47 +172,34 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Early notification: If the task is due in 5 minutes (300000 ms) and is not completed
         if (timeDiff <= 300000 && timeDiff > 240000 && task.category !== 'completed') {
-          // Play notification sound
-          notificationSound.play().catch(err => console.error("Could not play notification sound:", err));
+          notificationService.sendNotification(
+            `Task Starting Soon: ${task.title}`,
+            `Your task will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`
+          );
           
           toast(`Task Starting Soon: ${task.title}`, {
             description: `Your task will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`,
             duration: 10000,
           });
-
-          // If browser notifications are supported and permitted
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Task Starting Soon", {
-              body: `${task.title} will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`,
-              icon: "/favicon.ico"
-            });
-          }
         }
         
         // Regular due notification
         if (timeDiff <= 60000 && timeDiff > 0 && task.category !== 'completed') {
-          notificationSound.play().catch(err => console.error("Could not play notification sound:", err));
+          notificationService.sendNotification(
+            `Task Due: ${task.title}`,
+            `Priority: ${task.priority.toUpperCase()}`
+          );
           
           toast(`Task Due: ${task.title}`, {
             description: `Priority: ${task.priority.toUpperCase()}`,
             duration: 5000,
           });
-
-          // If browser notifications are supported and permitted
-          if ("Notification" in window && Notification.permission === "granted") {
-            new Notification("Task Due Now", {
-              body: `${task.title} is due now. Priority: ${task.priority.toUpperCase()}`,
-              icon: "/favicon.ico"
-            });
-          }
         }
       });
     };
 
     // Request notification permission on component mount
-    if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
-      Notification.requestPermission();
-    }
+    notificationService.requestPermission();
 
     // Check immediately when component mounts
     checkDueTasks();
@@ -189,6 +213,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // For a real implementation, this would connect to a backend API
       // For now, we'll just simulate by updating the last sync time and showing a toast
       setLastSyncTime(Date.now());
+      
+      // Force a refresh of localStorage to trigger syncing
+      if (broadcastChannel) {
+        broadcastChannel.postMessage({
+          type: 'TASKS_UPDATED',
+          tasks: tasks,
+          sourceDeviceId: deviceId
+        });
+      }
       
       uiToast({
         title: "Tasks synchronized",
