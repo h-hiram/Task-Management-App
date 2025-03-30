@@ -77,7 +77,11 @@ const BackgroundEffects: React.FC = () => {
 
       {/* Additional subtle patterns */}
       {!isMobile && (
-        <div className="fixed inset-0 bg-[url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"><circle cx=\"10\" cy=\"10\" r=\"1\" fill=\"rgba(255,255,255,0.2)\"/></svg>')] bg-repeat opacity-30 pointer-events-none"></div>
+        <div className="fixed inset-0 bg-repeat opacity-30 pointer-events-none" 
+          style={{
+            backgroundImage: "url('data:image/svg+xml;utf8,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 20 20\"%3E%3Ccircle cx=\"10\" cy=\"10\" r=\"1\" fill=\"rgba(255,255,255,0.2)\"%2F%3E%3C/svg%3E')"
+          }}
+        ></div>
       )}
     </>
   );
