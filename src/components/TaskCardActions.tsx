@@ -29,24 +29,40 @@ const TaskCardActions: React.FC<TaskCardActionsProps> = ({
 }) => {
   if (isMobile) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="bg-white/50">
-            <MoreHorizontal className="h-4 w-4 mr-1" />
-            Actions
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={onComplete}>
-            {task.category === 'completed' ? 'Mark as Pending' : 'Mark as Completed'}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onDefer}>
-            {task.category === 'deferred' ? 'Resume Task' : 'Defer Task'}
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onEdit(task)}>Edit</DropdownMenuItem>
-          <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-500">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex flex-wrap gap-2 w-full">
+        <Button
+          variant={task.category === 'completed' ? "secondary" : "outline"}
+          size="sm"
+          onClick={onComplete}
+          className={`flex-1 min-w-[100px] ${task.category === 'completed' ? "bg-green-100" : ""}`}
+        >
+          <CheckCircle2 className={`h-4 w-4 mr-1 ${task.category === 'completed' ? "text-green-500" : ""}`} />
+          {task.category === 'completed' ? 'Completed' : 'Complete'}
+        </Button>
+        
+        <Button
+          variant={task.category === 'deferred' ? "secondary" : "outline"}
+          size="sm"
+          onClick={onDefer}
+          className={`flex-1 min-w-[100px] ${task.category === 'deferred' ? "bg-yellow-100" : ""}`}
+        >
+          <PauseCircle className={`h-4 w-4 mr-1 ${task.category === 'deferred' ? "text-yellow-500" : ""}`} />
+          {task.category === 'deferred' ? 'Deferred' : 'Defer'}
+        </Button>
+        
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="bg-white/50">
+              <MoreHorizontal className="h-4 w-4 mr-1" />
+              More
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-white border border-gray-200">
+            <DropdownMenuItem onClick={() => onEdit(task)}>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-500">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     );
   }
   
