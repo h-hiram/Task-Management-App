@@ -321,6 +321,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateTask = (id: string, taskUpdate: Partial<Task>) => {
     console.log("Updating task:", id, "with updates:", taskUpdate);
+    
+    const currentTask = tasks.find(task => task.id === id);
+    
     setTasks(prev => 
       prev.map(task => 
         task.id === id 
@@ -341,7 +344,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Task completed",
         description: "Task has been marked as completed",
       });
-    } else if (taskUpdate.category === 'pending' && prev.find(task => task.id === id)?.category === 'deferred') {
+    } else if (taskUpdate.category === 'pending' && currentTask?.category === 'deferred') {
       uiToast({
         title: "Task resumed",
         description: "Deferred task has been resumed",
