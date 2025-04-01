@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Priority, Category } from '@/types/task';
 import { toast } from 'sonner';
@@ -24,7 +23,6 @@ interface TaskContextType {
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
-// Function to generate a unique device ID if it doesn't exist
 const getDeviceId = () => {
   let deviceId = localStorage.getItem('device_id');
   if (!deviceId) {
@@ -34,7 +32,6 @@ const getDeviceId = () => {
   return deviceId;
 };
 
-// Create a BroadcastChannel for cross-tab communication if supported
 const createBroadcastChannel = () => {
   if (typeof BroadcastChannel !== 'undefined') {
     return new BroadcastChannel('task_sync_channel');
@@ -42,12 +39,10 @@ const createBroadcastChannel = () => {
   return null;
 };
 
-// Mobile-friendly timestamp for more reliable syncing
 const getCurrentTimestamp = () => {
   return new Date().getTime();
 };
 
-// Load tasks from localStorage or use default tasks
 const loadTasks = (): Task[] => {
   if (typeof window === 'undefined') return [];
   
@@ -55,7 +50,6 @@ const loadTasks = (): Task[] => {
   if (savedTasks) {
     try {
       const parsedTasks = JSON.parse(savedTasks);
-      // Convert string dates back to Date objects
       return parsedTasks.map((task: any) => ({
         ...task,
         dueDate: new Date(task.dueDate),
@@ -71,7 +65,6 @@ const loadTasks = (): Task[] => {
   return getDefaultTasks();
 };
 
-// Default tasks if nothing in localStorage
 const getDefaultTasks = (): Task[] => {
   return [
     {
@@ -129,13 +122,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [broadcastChannel] = useState(createBroadcastChannel());
   const notificationService = NotificationService.getInstance();
 
-  // More robust initialization to ensure tasks are loaded on mobile
   useEffect(() => {
     const initialTasks = loadTasks();
     console.log("Initial tasks loaded:", initialTasks.length);
     setTasks(initialTasks);
     
-    // Set up a listener for storage events to sync between tabs
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'tasks') {
         try {
@@ -153,7 +144,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    // Listen for BroadcastChannel messages
     const handleBroadcastMessage = (event: MessageEvent) => {
       try {
         if (event.data.type === 'TASKS_UPDATED') {
@@ -183,26 +173,20 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [broadcastChannel]);
 
-  // Enhanced persistence logic to handle mobile environments better
   useEffect(() => {
     if (typeof window !== 'undefined' && tasks.length > 0) {
       try {
-        // Stringify with proper date handling
         const tasksJson = JSON.stringify(tasks);
         localStorage.setItem('tasks', tasksJson);
         console.log("Tasks saved to localStorage:", tasks.length);
         
-        // Force sync on task changes for mobile
         if (isMobile) {
-          // Add a small delay to ensure storage is updated
           setTimeout(() => {
             console.log("Mobile sync triggered automatically");
-            // Also update lastSyncTime for mobile
             setLastSyncTime(getCurrentTimestamp());
           }, 100);
         }
         
-        // Broadcast to other tabs/windows
         if (broadcastChannel) {
           broadcastChannel.postMessage({
             type: 'TASKS_UPDATED',
@@ -217,12 +201,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [tasks, broadcastChannel, deviceId, isMobile]);
 
-  // Check for tasks due soon or already due every minute
   useEffect(() => {
     const checkDueTasks = () => {
       const now = new Date();
       tasks.forEach(task => {
-        // Skip completed, deferred or deployed tasks for notifications
         if (task.category === 'completed' || task.category === 'deferred' || task.category === 'deployed') {
           return;
         }
@@ -230,7 +212,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const dueDate = new Date(task.dueDate);
         const timeDiff = dueDate.getTime() - now.getTime();
         
-        // Early notification: Task due in 5 minutes (300000 ms)
         if (timeDiff <= 300000 && timeDiff > 240000) {
           notificationService.sendNotification(
             `Task Starting Soon: ${task.title}`,
@@ -243,7 +224,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
         
-        // Notification exactly at due time (within a minute window)
         if (timeDiff <= 60000 && timeDiff > -60000) {
           notificationService.sendNotification(
             `Task Due Now: ${task.title}`,
@@ -258,21 +238,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     };
 
-    // Request notification permission on component mount
     notificationService.requestPermission();
-
-    // Check immediately when component mounts
     checkDueTasks();
     
-    // Check every 30 seconds for more immediate notifications
     const intervalId = setInterval(checkDueTasks, 30000);
     return () => clearInterval(intervalId);
   }, [tasks]);
 
-  // Enhanced sync function for cross-device sync button
   const syncTasks = async () => {
     try {
-      // Force a refresh from localStorage first
       const storedTasks = localStorage.getItem('tasks');
       if (storedTasks) {
         console.log("Manual sync - loading from localStorage");
@@ -288,10 +262,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentTime = getCurrentTimestamp();
       setLastSyncTime(currentTime);
       
-      // Force update localStorage again
       localStorage.setItem('last_sync', currentTime.toString());
       
-      // Force a refresh of localStorage to trigger syncing
       if (broadcastChannel) {
         broadcastChannel.postMessage({
           type: 'TASKS_UPDATED',
@@ -316,9 +288,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Set up auto-sync timer (every 2 minutes for mobile, 5 minutes for desktop)
   useEffect(() => {
-    const syncInterval = isMobile ? 120000 : 300000; // 2 minutes for mobile, 5 minutes for desktop
+    const syncInterval = isMobile ? 120000 : 300000;
     console.log(`Auto-sync set up, interval: ${syncInterval}ms`);
     
     const autoSyncInterval = setInterval(() => {
@@ -340,7 +311,6 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("Adding new task:", newTask.title);
     setTasks(prev => [...prev, newTask]);
     
-    // Force immediate sync after adding a task
     setTimeout(() => syncTasks(), 100);
     
     uiToast({
@@ -350,7 +320,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateTask = (id: string, taskUpdate: Partial<Task>) => {
-    console.log("Updating task:", id);
+    console.log("Updating task:", id, "with updates:", taskUpdate);
     setTasks(prev => 
       prev.map(task => 
         task.id === id 
@@ -359,20 +329,35 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
     );
     
-    // Force immediate sync after updating a task
     setTimeout(() => syncTasks(), 100);
     
-    uiToast({
-      title: "Task updated",
-      description: "Your task has been successfully updated",
-    });
+    if (taskUpdate.category === 'deferred') {
+      uiToast({
+        title: "Task deferred",
+        description: "Task has been marked as deferred",
+      });
+    } else if (taskUpdate.category === 'completed') {
+      uiToast({
+        title: "Task completed",
+        description: "Task has been marked as completed",
+      });
+    } else if (taskUpdate.category === 'pending' && prev.find(task => task.id === id)?.category === 'deferred') {
+      uiToast({
+        title: "Task resumed",
+        description: "Deferred task has been resumed",
+      });
+    } else {
+      uiToast({
+        title: "Task updated",
+        description: "Your task has been successfully updated",
+      });
+    }
   };
 
   const deleteTask = (id: string) => {
     console.log("Deleting task:", id);
     setTasks(prev => prev.filter(task => task.id !== id));
     
-    // Force immediate sync after deleting a task
     setTimeout(() => syncTasks(), 100);
     
     uiToast({
@@ -385,19 +370,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return tasks.find(task => task.id === id);
   };
 
-  // Apply filters and search to tasks
   const filteredTasks = tasks.filter(task => {
-    // Apply priority filter
     if (filterPriority && task.priority !== filterPriority) {
       return false;
     }
     
-    // Apply category filter
     if (filterCategory && task.category !== filterCategory) {
       return false;
     }
     
-    // Apply search query
     if (searchQuery && 
        !task.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
        !task.description.toLowerCase().includes(searchQuery.toLowerCase())) {

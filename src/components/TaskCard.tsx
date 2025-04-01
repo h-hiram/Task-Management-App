@@ -259,7 +259,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit }) => {
                   {task.category === 'completed' ? 'Mark as Pending' : 'Mark as Completed'}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleDeferToggle}>
-                  {task.category === 'deferred' ? 'Undefer Task' : 'Defer Task'}
+                  {task.category === 'deferred' ? 'Resume Task' : 'Defer Task'}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onEdit(task)}>Edit</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => deleteTask(task.id)} className="text-red-500">Delete</DropdownMenuItem>
@@ -270,18 +270,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit }) => {
           <>
             <div className="flex gap-2">
               <Button
-                variant="outline"
+                variant={task.category === 'completed' ? "secondary" : "outline"}
                 size="sm"
                 onClick={handleCompleteToggle}
+                className={task.category === 'completed' ? "bg-green-100" : ""}
               >
-                {task.category === 'completed' ? 'Mark as Pending' : 'Mark as Completed'}
+                <CheckCircle2 className={`h-4 w-4 mr-1 ${task.category === 'completed' ? "text-green-500" : ""}`} />
+                {task.category === 'completed' ? 'Completed' : 'Complete'}
               </Button>
               <Button
-                variant="outline"
+                variant={task.category === 'deferred' ? "secondary" : "outline"}
                 size="sm"
                 onClick={handleDeferToggle}
+                className={task.category === 'deferred' ? "bg-yellow-100" : ""}
               >
-                {task.category === 'deferred' ? 'Undefer' : 'Defer'}
+                <PauseCircle className={`h-4 w-4 mr-1 ${task.category === 'deferred' ? "text-yellow-500" : ""}`} />
+                {task.category === 'deferred' ? 'Deferred' : 'Defer'}
               </Button>
             </div>
             <div className="flex gap-2">
