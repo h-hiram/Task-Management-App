@@ -1,19 +1,35 @@
-import * as React from "react"
 
-const MOBILE_BREAKPOINT = 768
+import { useState, useEffect } from 'react';
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+export const useIsMobile = (): boolean => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Initial check
+    const checkDeviceType = () => {
+      // Check if running in a Capacitor native app
+      const isCapacitorNative = 
+        typeof (window as any).Capacitor !== 'undefined' && 
+        (window as any).Capacitor.isNative;
+      
+      // Also check for mobile browsers
+      const isMobileBrowser = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      ) || window.innerWidth <= 768;
+      
+      setIsMobile(isCapacitorNative || isMobileBrowser);
+    };
+    
+    checkDeviceType();
+    
+    // Add listener for orientation/resize changes
+    window.addEventListener('resize', checkDeviceType);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', checkDeviceType);
+  }, []);
+  
+  return isMobile;
+};
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener("change", onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener("change", onChange)
-  }, [])
-
-  return !!isMobile
-}
+export default useIsMobile;

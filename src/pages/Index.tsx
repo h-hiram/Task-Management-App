@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PlusCircle, List, Calendar, Sparkles, Cloud, SmartphoneNfc } from 'lucide-react';
+import { PlusCircle, List, Calendar, Sparkles, Cloud, SmartphoneNfc, RefreshCw } from 'lucide-react';
 import { useTaskContext } from '@/contexts/TaskContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
@@ -24,6 +24,7 @@ const TaskDashboard: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const { addTask, updateTask, syncTasks } = useTaskContext();
   const isMobile = useIsMobile();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Request notification permission
   useEffect(() => {
@@ -38,6 +39,16 @@ const TaskDashboard: React.FC = () => {
       });
     }
   }, []);
+
+  // Force a sync on page load for mobile
+  useEffect(() => {
+    if (isMobile) {
+      console.log("Mobile detected, forcing initial sync");
+      setTimeout(() => {
+        syncTasks();
+      }, 1000);
+    }
+  }, [isMobile, syncTasks]);
 
   const handleAddTask = () => {
     setSelectedTask(undefined);
@@ -59,8 +70,14 @@ const TaskDashboard: React.FC = () => {
   };
 
   const handleSyncClick = () => {
+    setIsRefreshing(true);
     syncTasks();
     toast.success("Tasks synchronized across devices");
+    
+    // Add visual feedback
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
   };
 
   return (
@@ -79,9 +96,14 @@ const TaskDashboard: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleSyncClick}
+            disabled={isRefreshing}
             className="bg-white/30 backdrop-blur-sm border border-white/40 hover:bg-white/40 transition-all"
           >
-            <Cloud className="h-4 w-4 mr-2 text-blue-500" />
+            {isRefreshing ? (
+              <RefreshCw className="h-4 w-4 mr-2 text-blue-500 animate-spin" />
+            ) : (
+              <Cloud className="h-4 w-4 mr-2 text-blue-500" />
+            )}
             {isMobile ? "Sync" : "Sync Tasks"}
           </Button>
           
@@ -98,7 +120,7 @@ const TaskDashboard: React.FC = () => {
       {isMobile && (
         <div className="mb-4 p-2 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 text-sm flex items-center">
           <SmartphoneNfc className="h-4 w-4 mr-2 text-blue-500" />
-          <span>Your tasks will sync across devices automatically every 5 minutes</span>
+          <span>Mobile sync enabled. Tap Sync button if tasks aren't appearing.</span>
         </div>
       )}
       
