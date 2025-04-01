@@ -1,38 +1,28 @@
 
 
 ## Project info
-
-**URL**: https://lovable.dev/projects/391b2d48-9d9b-48e6-a563-c650bebfc859
+This is a simple task management system that uses typescript,javascript and a some css and html. The web app has tasks categorized in different groups;pending,completed,deffered and ongoing tasks. They also have a priority from low to high. It has notifications turned on once a times task has arrived and the countdown is available in hours.Enjoy the project by testing it yourself.
 
 ## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/391b2d48-9d9b-48e6-a563-c650bebfc859) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+You can directly download the zip here and find all codes and componenrs.
 
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
-
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/h-hiram/tasklight-harmony
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Step 2: Navigate to the project directory.
+cd tasklight-harmony
 
-# Step 3: Install the necessary dependencies.
-npm i
+Step 3: Install the necessary dependencies.
+npm iinstall
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -51,7 +41,8 @@ To run the app on a mobile device:
 7. Open and run the project:
    - For Android: `npx cap open android` (requires Android Studio)
    - For iOS: `npx cap open ios` (requires Xcode)
-
+Another method To run the app on a mobile device:
+if you have a server in your local host,you can connect you phone to your pc provided you are in the same network using your pc's ip address and the apps port number (http://<YOUR PC IP>/<PORTNUMBER>
 ### Updating the app after changes
 
 After making changes to your web code:
@@ -59,8 +50,6 @@ After making changes to your web code:
 1. Build the project: `npm run build`
 2. Sync changes to the native project: `npx cap sync`
 3. Open and run the project again
-
-## What technologies are used for this project?
 
 This project is built with:
 
@@ -71,10 +60,3 @@ This project is built with:
 - Tailwind CSS
 - Capacitor (for mobile apps)
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/391b2d48-9d9b-48e6-a563-c650bebfc859) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
