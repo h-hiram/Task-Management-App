@@ -1,4 +1,2 @@
-
-// Since we can't directly include binary data, you would need to upload a proper
-// notification.mp3 file. This is a placeholder to indicate that the file should be updated
-// with a clear, pleasant notification sound that works well on both desktop and mobile devices.
+// We'll replace this with a real sound file by downloading a clear notification sound
+// The actual binary file will be downloaded from a web source

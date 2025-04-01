@@ -15,6 +15,10 @@ class NotificationService {
     if (this.isCapacitor) {
       this.setupCapacitorNotifications();
     }
+    
+    // Preload the notification sound for faster response
+    this.notificationSound.preload = 'auto';
+    this.notificationSound.load();
   }
 
   public static getInstance(): NotificationService {
@@ -35,7 +39,7 @@ class NotificationService {
 
   public async sendNotification(title: string, body: string, id: number = Date.now()): Promise<void> {
     try {
-      // Play sound on both web and native
+      // Play sound on both web and native immediately
       this.playSound();
 
       if (this.isCapacitor) {
@@ -82,10 +86,22 @@ class NotificationService {
 
   public playSound(): void {
     try {
+      // Reset sound to beginning to ensure it plays
       this.notificationSound.currentTime = 0;
-      this.notificationSound.play().catch(err => 
-        console.error("Could not play notification sound:", err)
-      );
+      
+      // Play immediately without waiting
+      const playPromise = this.notificationSound.play();
+      
+      // Handle any errors with playing
+      if (playPromise !== undefined) {
+        playPromise.catch(err => {
+          console.error("Could not play notification sound:", err);
+          // If autoplay is blocked, try again after user interaction
+          document.addEventListener('click', () => {
+            this.notificationSound.play().catch(e => console.error("Still couldn't play sound:", e));
+          }, { once: true });
+        });
+      }
     } catch (error) {
       console.error('Error playing notification sound:', error);
     }

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Task, Priority, Category } from '@/types/task';
 import { toast } from 'sonner';
@@ -89,6 +90,16 @@ const loadTasks = (): Task[] => {
       createdAt: new Date(),
       updatedAt: new Date(),
     },
+    {
+      id: '4',
+      title: 'Research competitors',
+      description: 'Task was left alone due to higher priorities',
+      dueDate: new Date(new Date().setDate(new Date().getDate() - 1)),
+      priority: 'low' as Priority,
+      category: 'deferred' as Category,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
   ];
 };
 
@@ -162,16 +173,21 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [tasks, broadcastChannel, deviceId]);
 
-  // Check for tasks due in 5 minutes and for due tasks every minute
+  // Check for tasks due soon or already due every minute
   useEffect(() => {
     const checkDueTasks = () => {
       const now = new Date();
       tasks.forEach(task => {
+        // Skip completed, deferred or deployed tasks for notifications
+        if (task.category === 'completed' || task.category === 'deferred' || task.category === 'deployed') {
+          return;
+        }
+        
         const dueDate = new Date(task.dueDate);
         const timeDiff = dueDate.getTime() - now.getTime();
         
-        // Early notification: If the task is due in 5 minutes (300000 ms) and is not completed
-        if (timeDiff <= 300000 && timeDiff > 240000 && task.category !== 'completed') {
+        // Early notification: Task due in 5 minutes (300000 ms)
+        if (timeDiff <= 300000 && timeDiff > 240000) {
           notificationService.sendNotification(
             `Task Starting Soon: ${task.title}`,
             `Your task will start in 5 minutes. Priority: ${task.priority.toUpperCase()}`
@@ -183,14 +199,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
         
-        // Regular due notification
-        if (timeDiff <= 60000 && timeDiff > 0 && task.category !== 'completed') {
+        // Notification exactly at due time (within a minute window)
+        if (timeDiff <= 60000 && timeDiff > -60000) {
           notificationService.sendNotification(
-            `Task Due: ${task.title}`,
+            `Task Due Now: ${task.title}`,
             `Priority: ${task.priority.toUpperCase()}`
           );
           
-          toast(`Task Due: ${task.title}`, {
+          toast(`Task Due Now: ${task.title}`, {
             description: `Priority: ${task.priority.toUpperCase()}`,
             duration: 5000,
           });
@@ -203,7 +219,9 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Check immediately when component mounts
     checkDueTasks();
-    const intervalId = setInterval(checkDueTasks, 60000);
+    
+    // Check every 30 seconds for more immediate notifications
+    const intervalId = setInterval(checkDueTasks, 30000);
     return () => clearInterval(intervalId);
   }, [tasks]);
 

@@ -14,6 +14,11 @@ const config: CapacitorConfig = {
       smallIcon: "ic_stat_icon_config_sample",
       iconColor: "#8ec5fc",
       sound: "notification.mp3",
+      schedule: {
+        on: {
+          every: "minute"
+        }
+      }
     }
   }
 };
