@@ -5,27 +5,23 @@ This is a simple task management system that uses typescript,javascript and a so
 You can directly download the zip here and find all codes and componenrs.
 
 **Use your preferred IDE**
-
 If you want to work locally using your own IDE, you can clone this repo and push changes.
-
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone https://github.com/h-hiram/Task-Management-App
+#Step 1: Clone the repository using the project's Git URL.
+```git clone https://github.com/h-hiram/Task-Management-App```
 
 Step 2: Navigate to the project directory.
-cd Task-Management-App
+```cd Task-Management-App```
 
 Step 3: Install the necessary dependencies.
-npm install
+```npm install```
 
 Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```npm run dev```
 
 #Acces the app in your browser through
-http://localhost:8080
-```
+```http://localhost:8080```
 
 2. Git pull the project from your own GitHub repository
 3. Run `npm install` to install all dependencies
