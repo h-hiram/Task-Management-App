@@ -1,5 +1,3 @@
-
-
 ## Project info
 This is a simple task management system that uses typescript,javascript and a some css and html. The web app has tasks categorized in different groups;pending,completed,deffered and ongoing tasks. They also have a priority from low to high. It has notifications turned on once a times task has arrived and the countdown is available in hours.Enjoy the project by testing it yourself.
 
@@ -29,11 +27,6 @@ npm run dev
 http://localhost:8080
 ```
 
-## Mobile Installation Instructions
-
-To run the app on a mobile device:
-
-1. Transfer the project to your GitHub repository using the "Export to GitHub" button
 2. Git pull the project from your own GitHub repository
 3. Run `npm install` to install all dependencies
 4. Add iOS and/or Android platforms:
