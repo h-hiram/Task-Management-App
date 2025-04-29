@@ -12,15 +12,19 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 ```git clone https://github.com/h-hiram/Task-Management-App```
 
 Step 2: Navigate to the project directory.
+
 ```cd Task-Management-App```
 
 Step 3: Install the necessary dependencies.
+
 ```npm install```
 
 Step 4: Start the development server with auto-reloading and an instant preview.
+
 ```npm run dev```
 
 #Acces the app in your browser through
+
 ```http://localhost:8080```
 
 2. Git pull the project from your own GitHub repository
