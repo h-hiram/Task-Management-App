@@ -14,16 +14,18 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone https://github.com/h-hiram/tasklight-harmony
+git clone https://github.com/h-hiram/Task-Management-App
 
 Step 2: Navigate to the project directory.
-cd tasklight-harmony
+cd Task-Management-App
 
 Step 3: Install the necessary dependencies.
 npm iinstall
 
 Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
+
+Acces the app in your browser through http://localhost:8080
 ```
 
 ## Mobile Installation Instructions
