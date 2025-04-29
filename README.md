@@ -20,12 +20,13 @@ Step 2: Navigate to the project directory.
 cd Task-Management-App
 
 Step 3: Install the necessary dependencies.
-npm iinstall
+npm install
 
 Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 
-Acces the app in your browser through http://localhost:8080
+#Acces the app in your browser through
+http://localhost:8080
 ```
 
 ## Mobile Installation Instructions
