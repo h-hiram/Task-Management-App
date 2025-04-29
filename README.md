@@ -8,7 +8,7 @@ You can directly download the zip here and find all codes and componenrs.
 If you want to work locally using your own IDE, you can clone this repo and push changes.
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-#Step 1: Clone the repository using the project's Git URL.
+Step 1: Clone the repository using the project's Git URL.
 
 `git clone https://github.com/h-hiram/Task-Management-App`
 
