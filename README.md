@@ -9,6 +9,18 @@ Key Features:
 -Countdown timer available in hours for upcoming tasks.
 
 Feel free to explore and test the project yourself. Enjoy!
+### Dashboard View
+![Dashboard](./assets/dashboard.png)
+
+### Calendar view
+![Task Details](./assets/calendarview.png)
+
+### Task Details View
+![Task Details](./assets/priorities.png)
+
+### Task Details View
+![Task Details](./assets/.png)
+
 ## How you can edit this code:
 You can directly download the zip here and find all codes and componenrs.
 
