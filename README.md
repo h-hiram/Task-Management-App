@@ -25,7 +25,9 @@ git clone https://github.com/h-hiram/Task-Management-App
 ```
 
 Step 2: Navigate to the project directory.
-
+```bash
+cd Task-Management-App
+```
 ```bashcd Task-Management-App
 ```
 
