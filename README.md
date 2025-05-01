@@ -9,12 +9,14 @@ Key Features:
 -Countdown timer available in hours for upcoming tasks.
 
 Feel free to explore and test the project yourself. Enjoy!
-## How can I edit this code?
+## How you can edit this code:
 You can directly download the zip here and find all codes and componenrs.
 
 **Use your preferred IDE**
 If you want to work locally using your own IDE, you can clone this repo and push changes.
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+## To run the app locally, follow the following steps:
 
 Step 1: Clone the repository using the project's Git URL.
 
