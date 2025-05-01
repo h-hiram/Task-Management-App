@@ -52,7 +52,6 @@ http://localhost:8080
 - Vite
 - TypeScript
 - React
-- shadcn-ui
 - Tailwind CSS
 - Capacitor (for mobile apps)
 
