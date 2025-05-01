@@ -15,11 +15,11 @@ Feel free to explore and test the project yourself. Enjoy!
 ### Calendar view
 ![Task Details](./assets/calendarview.png)
 
-### Task Details View
+### Priorities
 ![Task Details](./assets/priorities.png)
 
-### Task Details View
-![Task Details](./assets/.png)
+### Categories
+![Task Details](./assets/categories.png)
 
 ## How you can edit this code:
 You can directly download the zip here and find all codes and componenrs.
