@@ -41,7 +41,7 @@ Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
-#Acces the app in your browser through
+Step 5: Access the app in your browser through:
 
 ```bash
 http://localhost:8080
