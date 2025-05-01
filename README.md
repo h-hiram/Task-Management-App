@@ -47,7 +47,7 @@ npm run dev
 http://localhost:8080
 ```
 
-##This project is built with:
+## This project is built with:
 
 - Vite
 - TypeScript
