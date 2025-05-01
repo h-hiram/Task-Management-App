@@ -21,6 +21,7 @@ Feel free to explore and test the project yourself. Enjoy!
 ### Categories
 ![Task Details](./assets/categories.png)
 
+
 ## How you can edit this code:
 You can directly download the zip here and find all codes and componenrs.
 
