@@ -41,8 +41,6 @@ Step 2: Navigate to the project directory.
 ```bash
 cd Task-Management-App
 ```
-```bashcd Task-Management-App
-```
 
 Step 3: Install the necessary dependencies.
 
